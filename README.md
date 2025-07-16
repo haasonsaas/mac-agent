@@ -13,6 +13,18 @@ This agent uses a two-agent crew:
 
 This separation of concerns makes the agent more reliable and capable of handling complex, multi-step tasks.
 
+## Human-in-the-Loop: Your Safety is Key
+
+Before the agent executes **any** shell command, it will first print the command and ask for your explicit approval. 
+
+```
+Proposed command to execute:
+[0;33mls -l[0m
+👉 Proceed with execution? (y/n): 
+```
+
+You must type `y` and press Enter for the command to run. This is a critical safety feature to ensure you are always in control of what the agent does on your system.
+
 ## Setup
 
 1.  **Install Python:**
@@ -67,6 +79,4 @@ To ensure the agent is working correctly, you can run the test suite:
 ./run_tests.sh
 ```
 
-This will execute a series of predefined prompts and check if the agent produces the expected output.
-
-**Safety:** The agent will show you the commands it intends to run as part of its thought process. **Always monitor the agent's actions**, especially when you ask it to perform tasks that might modify or delete files.
+This will execute a series of predefined prompts in a non-interactive mode and check if the agent produces the expected output.

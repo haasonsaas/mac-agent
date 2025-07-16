@@ -2,6 +2,9 @@
 
 # A simple test suite for the mac-agent
 
+# Set non-interactive mode for tests
+export MAC_AGENT_NON_INTERACTIVE="true"
+
 # Get the directory of the script itself
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 

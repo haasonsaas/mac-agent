@@ -5,6 +5,7 @@ from crewai import Agent, Task, Crew, Process
 from crewai_tools import DuckDuckGoSearchRun
 from tools import ShellTool
 from file_tools import FileTool
+from applescript_tools import AppleScriptTool
 
 def load_config():
     """Loads configuration from config.json."""
@@ -28,6 +29,7 @@ if config.get("openai_base_url"):
 shell_tool = ShellTool()
 search_tool = DuckDuckGoSearchRun()
 file_tool = FileTool()
+applescript_tool = AppleScriptTool()
 
 # --- Define Agents ---
 
@@ -51,9 +53,10 @@ executor = Agent(
         "You are an expert at executing tasks. You take a step-by-step plan and use the best tool for the job. "
         "For general shell commands, use the ShellTool. "
         "For file system operations like reading, writing, or listing files, **you must use the FileTool** as it is safer and more structured. "
+        "For controlling macOS applications or the GUI, **you must use the AppleScriptTool**."
         "You do not deviate from the plan. You are careful and will report the results of each action accurately."
     ),
-    tools=[shell_tool, file_tool],
+    tools=[shell_tool, file_tool, applescript_tool],
     allow_delegation=False,
     verbose=True
 )

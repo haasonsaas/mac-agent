@@ -9,7 +9,10 @@ It leverages a Large Language Model (LLM) to understand your intent, create a pl
 This agent uses a two-agent crew:
 
 1.  **Planner Agent**: Analyzes your request and creates a step-by-step plan. It can use a web search tool to find information.
-2.  **Executor Agent**: Takes the plan from the Planner and executes each step using a shell tool.
+2.  **Executor Agent**: Takes the plan from the Planner and executes each step using its specialized tools:
+    *   **ShellTool**: For general terminal commands.
+    *   **FileTool**: For safer reading, writing, and listing of files.
+    *   **AppleScriptTool**: For controlling macOS applications and the GUI.
 
 This separation of concerns makes the agent more reliable and capable of handling complex, multi-step tasks.
 
@@ -69,6 +72,9 @@ To use the agent, simply run the `do.sh` script with your request in plain Engli
 
 # A complex, multi-step command
 ./do.sh "Find the current weather in London, create a file named weather.txt with the information, and then print the file's content."
+
+# Using the AppleScriptTool to display a notification
+./do.sh "Display a notification saying 'Hello from your Mac Agent!'"
 ```
 
 ## Testing

@@ -37,4 +37,3 @@ class FileTool(BaseTool):
             return f"Error: The path {path} was not found."
         except Exception as e:
             return f"An unexpected error occurred: {e}"
-

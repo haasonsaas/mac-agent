@@ -1,8 +1,8 @@
-# Mac Agent
+# Mac Agent (crewAI Edition)
 
-This is a simple agent that uses a Large Language Model (LLM) to translate your natural language requests into executable shell commands on your macOS.
+This is an intelligent agent that uses crewAI to translate your natural language requests into executable shell commands on your macOS.
 
-It is designed to be a "hybrid tool-using agent," meaning it will try to use the best tool for the job, whether that's a standard shell command (`find`, `curl`) or `osascript` for controlling applications and the GUI.
+It leverages a Large Language Model (LLM) to understand your intent and uses a dedicated `ShellTool` to execute commands, making it a robust and flexible automation assistant.
 
 ## Setup
 
@@ -10,18 +10,17 @@ It is designed to be a "hybrid tool-using agent," meaning it will try to use the
     Make sure you have Python 3 installed on your system.
 
 2.  **Install Dependencies:**
-    This agent uses the `openai` library to communicate with the LLM. You'll need to install it.
+    This project uses `pip` to manage dependencies. Install them from the `requirements.txt` file.
     ```bash
-    pip install openai
+    pip install -r requirements.txt
     ```
 
-3.  **Set Your API Key:**
-    The agent needs an API key for an LLM provider (like OpenAI, Anthropic, or a local model provider). You must set this as an environment variable. Add the following line to your shell's configuration file (`~/.zshrc`, `~/.bashrc`, etc.).
-
+3.  **Configure the Agent:**
+    Copy the default configuration file to create your own personal config.
     ```bash
-    export OPENAI_API_KEY="your-api-key-here"
+    cp config.json.default config.json
     ```
-    *Note: Although the variable is `OPENAI_API_key`, you can use it with any service that has an OpenAI-compatible API, including local models run with `ollama` or `lm-studio` by also setting the `OPENAI_BASE_URL`.*
+    Now, edit `config.json` and add your LLM API key. You can also change the model and other settings here.
 
 4.  **Make the Script Executable:**
     You need to give the main script permission to run.
@@ -40,23 +39,23 @@ To use the agent, simply run the `do.sh` script with your request in plain Engli
 ### Examples
 
 ```bash
-# Example 1: Using shell commands
-./do.sh "Find all files larger than 10MB in my downloads folder and list them."
+# Find large files in your downloads folder
+./do.sh "Find all files larger than 100MB in my downloads folder."
 
-# Example 2: Using osascript to control an app
-./do.sh "Tell Spotify to play the next track."
+# Control an application using osascript
+./do.sh "Tell the Music app to play the next song."
 
-# Example 3: A hybrid approach
-./do.sh "Take a screenshot, save it to my desktop with the name 'test.png', and then open it."
+# A more complex, multi-step command
+./do.sh "What is the current weather in San Francisco?"
 ```
 
 ## How It Works
 
 1.  You run `./do.sh "your request"`.
-2.  The shell script passes your request to the `agent.py` Python script.
-3.  The Python script constructs a detailed prompt, asking the LLM to generate a shell script to accomplish your goal.
-4.  The LLM returns a shell script.
-5.  The agent shows you the proposed script and asks for your confirmation.
-6.  If you type `y` and press Enter, the script is executed. Otherwise, it is aborted.
+2.  The shell script invokes the `crew.py` script.
+3.  `crew.py` defines a specialized **Agent** whose goal is to fulfill your request.
+4.  It creates a **Task** with your prompt and assigns it to the agent.
+5.  The agent uses its **ShellTool** to think, plan, and execute the necessary shell commands.
+6.  crewAI's verbose output shows you the agent's thought process, the commands it's running, and the final result.
 
-**Safety:** The confirmation step is a critical safety feature. **Always review the script before you approve it**, especially if it includes commands that modify or delete files (`mv`, `rm`, etc.).
+**Safety:** The agent will show you the commands it intends to run as part of its thought process. **Always monitor the agent's actions**, especially when you ask it to perform tasks that might modify or delete files.

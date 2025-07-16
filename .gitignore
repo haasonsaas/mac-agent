@@ -1,0 +1,9 @@
+# User-specific configuration
+config.json
+
+# Python cache
+__pycache__/
+*.pyc
+
+# History file
+.history.json

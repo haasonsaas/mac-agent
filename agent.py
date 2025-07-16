@@ -1,17 +1,29 @@
 import os
 import sys
+import json
 from openai import OpenAI
 
-def generate_script(prompt):
-    client = OpenAI()
+def load_config():
+    """Loads configuration from config.json."""
+    config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+    if not os.path.exists(config_path):
+        print("echo 'Error: config.json not found. Please copy config.json.default to config.json and fill in your details.'")
+        sys.exit(1)
+    with open(config_path, 'r') as f:
+        return json.load(f)
 
-    # You can swap the model for a different one (e.g., a local model)
-    # For local models, you might need to set the base_url:
-    # client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
+def generate_script(prompt, config):
+    """Generates a script using the LLM based on the user's prompt."""
+    api_key = os.environ.get("OPENAI_API_KEY") or config.get("openai_api_key")
+    
+    client = OpenAI(
+        api_key=api_key,
+        base_url=config.get("openai_base_url")
+    )
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o", # Or another powerful model like gpt-4, claude-3-opus-20240229
+            model=config.get("model", "gpt-4o"),
             messages=[
                 {
                     "role": "system",
@@ -39,7 +51,8 @@ def generate_script(prompt):
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         user_prompt = sys.argv[1]
-        generated_script = generate_script(user_prompt)
+        config = load_config()
+        generated_script = generate_script(user_prompt, config)
         print(generated_script)
     else:
         print("echo 'Error: No prompt provided.'")

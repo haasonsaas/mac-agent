@@ -9,14 +9,12 @@ class ShellTool(BaseTool):
 
     def _run(self, command: str) -> str:
         """Executes the given shell command after user confirmation."""
-        
         # Non-interactive mode for tests
         if os.environ.get("MAC_AGENT_NON_INTERACTIVE") == "true":
             print(f"Executing command (non-interactive): {command}")
         else:
             print(f"\nProposed command to execute:")
             print(f"\033[0;33m{command}\033[0m") # Print command in yellow
-            
             try:
                 # Check if stdin is a TTY. If not, we can't ask for input.
                 if not sys.stdin.isatty():
@@ -42,4 +40,3 @@ class ShellTool(BaseTool):
             return f"Command failed with exit code {e.returncode}.\nStdout:\n{e.stdout}\nStderr:\n{e.stderr}"
         except Exception as e:
             return f"An unexpected error occurred: {e}"
-

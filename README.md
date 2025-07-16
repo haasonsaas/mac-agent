@@ -15,12 +15,12 @@ This separation of concerns makes the agent more reliable and capable of handlin
 
 ## Human-in-the-Loop: Your Safety is Key
 
-Before the agent executes **any** shell command, it will first print the command and ask for your explicit approval. 
+Before the agent executes **any** shell command, it will first print the command and ask for your explicit approval.
 
 ```
 Proposed command to execute:
 [0;33mls -l[0m
-👉 Proceed with execution? (y/n): 
+👉 Proceed with execution? (y/n):
 ```
 
 You must type `y` and press Enter for the command to run. This is a critical safety feature to ensure you are always in control of what the agent does on your system.

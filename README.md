@@ -1,8 +1,17 @@
-# Mac Agent (crewAI Edition)
+# Mac Agent (crewAI Multi-Agent Edition)
 
-This is an intelligent agent that uses crewAI to translate your natural language requests into executable shell commands on your macOS.
+This is an intelligent agent that uses a multi-agent crewAI system to translate your natural language requests into executable shell commands on your macOS.
 
-It leverages a Large Language Model (LLM) to understand your intent and uses a dedicated `ShellTool` to execute commands, making it a robust and flexible automation assistant.
+It leverages a Large Language Model (LLM) to understand your intent, create a plan, and execute it, making it a robust and flexible automation assistant.
+
+## Architecture
+
+This agent uses a two-agent crew:
+
+1.  **Planner Agent**: Analyzes your request and creates a step-by-step plan. It can use a web search tool to find information.
+2.  **Executor Agent**: Takes the plan from the Planner and executes each step using a shell tool.
+
+This separation of concerns makes the agent more reliable and capable of handling complex, multi-step tasks.
 
 ## Setup
 
@@ -22,10 +31,11 @@ It leverages a Large Language Model (LLM) to understand your intent and uses a d
     ```
     Now, edit `config.json` and add your LLM API key. You can also change the model and other settings here.
 
-4.  **Make the Script Executable:**
-    You need to give the main script permission to run.
+4.  **Make Scripts Executable:**
+    You need to give the main scripts permission to run.
     ```bash
     chmod +x do.sh
+    chmod +x run_tests.sh
     ```
 
 ## Usage
@@ -39,23 +49,24 @@ To use the agent, simply run the `do.sh` script with your request in plain Engli
 ### Examples
 
 ```bash
-# Find large files in your downloads folder
-./do.sh "Find all files larger than 100MB in my downloads folder."
+# A simple command
+./do.sh "What day is it today?"
 
-# Control an application using osascript
-./do.sh "Tell the Music app to play the next song."
+# A command requiring web search
+./do.sh "What is the most popular programming language in 2024?"
 
-# A more complex, multi-step command
-./do.sh "What is the current weather in San Francisco?"
+# A complex, multi-step command
+./do.sh "Find the current weather in London, create a file named weather.txt with the information, and then print the file's content."
 ```
 
-## How It Works
+## Testing
 
-1.  You run `./do.sh "your request"`.
-2.  The shell script invokes the `crew.py` script.
-3.  `crew.py` defines a specialized **Agent** whose goal is to fulfill your request.
-4.  It creates a **Task** with your prompt and assigns it to the agent.
-5.  The agent uses its **ShellTool** to think, plan, and execute the necessary shell commands.
-6.  crewAI's verbose output shows you the agent's thought process, the commands it's running, and the final result.
+To ensure the agent is working correctly, you can run the test suite:
+
+```bash
+./run_tests.sh
+```
+
+This will execute a series of predefined prompts and check if the agent produces the expected output.
 
 **Safety:** The agent will show you the commands it intends to run as part of its thought process. **Always monitor the agent's actions**, especially when you ask it to perform tasks that might modify or delete files.

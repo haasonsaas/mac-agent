@@ -27,38 +27,59 @@ if config.get("openai_base_url"):
 shell_tool = ShellTool()
 search_tool = DuckDuckGoSearchRun()
 
-# Define the agent
-mac_agent = Agent(
-    role='Senior macOS Automation and Research Specialist',
-    goal='Fulfill user requests by combining web research with local command execution to achieve complex tasks.',
+# --- Define Agents ---
+
+planner = Agent(
+    role="Senior Planner and Research Analyst",
+    goal="Analyze user requests, break them down into a clear, step-by-step plan, and conduct web research for any required information.",
     backstory=(
-        "You are an expert in macOS automation and an adept web researcher. You have access to two powerful tools: "
-        "a shell for executing local commands and a web search tool for finding information. "
-        "Your primary goal is to seamlessly integrate these tools. For example, if a user asks to 'download the latest version of node.js', "
-        "you will first use the search tool to find the download URL, and then use the shell tool with `curl` to download it. "
-        "You are methodical, breaking down complex problems into a sequence of research and execution steps."
+        "You are a meticulous planner. Your expertise lies in taking a complex user goal and decomposing it into a series of simple, actionable steps. "
+        "You use your web search tool to gather all necessary information, such as URLs, commands, or best practices, before creating the final plan. "
+        "Your plans are passed to an Executor agent, so they must be unambiguous and easy to follow."
     ),
-    tools=[shell_tool, search_tool],
+    tools=[search_tool],
     allow_delegation=False,
     verbose=True
 )
 
-# Define the task
-def create_task(user_prompt):
-    return Task(
-        description=f"The user wants to perform the following action: '{user_prompt}'. Your task is to understand the request, create a plan, and then use your available tools (ShellTool and DuckDuckGoSearchRun) to execute the plan. The final answer must be the result of your work.",
-        expected_output="A summary of the actions taken and the final result or output.",
-        agent=mac_agent
+executor = Agent(
+    role="Command Execution Specialist",
+    goal="Execute the shell commands outlined in a given plan with precision and care.",
+    backstory=(
+        "You are an expert at executing shell commands. You take a step-by-step plan and run each command using your shell tool. "
+        "You do not deviate from the plan. You are careful and will report the results of each command's execution accurately."
+    ),
+    tools=[shell_tool],
+    allow_delegation=False,
+    verbose=True
+)
+
+# --- Define Tasks ---
+
+def create_tasks(user_prompt):
+    planning_task = Task(
+        description=f"The user wants to: '{user_prompt}'. Analyze this request and create a detailed, step-by-step plan to achieve the goal. If you need information, use your search tool. The final output of this task must be the plan.",
+        expected_output="A numbered, step-by-step plan that the Executor agent can follow.",
+        agent=planner
     )
+
+    execution_task = Task(
+        description="Take the plan provided and execute each step using your shell tool. The final answer must be a summary of the results of each step.",
+        expected_output="A summary of the execution results for each step in the plan.",
+        agent=executor,
+        context=[planning_task] # This task depends on the output of the planning_task
+    )
+    
+    return [planning_task, execution_task]
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         user_prompt = sys.argv[1]
-        task = create_task(user_prompt)
+        tasks = create_tasks(user_prompt)
         
         crew = Crew(
-            agents=[mac_agent],
-            tasks=[task],
+            agents=[planner, executor],
+            tasks=tasks,
             process=Process.sequential,
             verbose=2
         )

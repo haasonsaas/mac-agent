@@ -3,5 +3,6 @@
     "openai_api_key": "your-api-key-here",
     "openai_base_url": null,
     "history_file": ".history.json",
-    "max_history_length": 10
+    "max_history_length": 10,
+    "chroma_db_path": "./chroma_db"
 }

@@ -13,6 +13,7 @@ This agent uses a two-agent crew:
     *   **ShellTool**: For general terminal commands.
     *   **FileTool**: For safer reading, writing, and listing of files.
     *   **AppleScriptTool**: For controlling macOS applications and the GUI.
+    *   **MemoryTool**: For storing and retrieving information from long-term memory.
 
 This separation of concerns makes the agent more reliable and capable of handling complex, multi-step tasks.
 
@@ -75,6 +76,10 @@ To use the agent, simply run the `do.sh` script with your request in plain Engli
 
 # Using the AppleScriptTool to display a notification
 ./do.sh "Display a notification saying 'Hello from your Mac Agent!'"
+
+# Using the MemoryTool to store and retrieve information
+./do.sh "Remember that my favorite programming language is Python."
+./do.sh "What is my favorite programming language?"
 ```
 
 ## Testing

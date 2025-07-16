@@ -6,6 +6,7 @@ from crewai_tools import DuckDuckGoSearchRun
 from tools import ShellTool
 from file_tools import FileTool
 from applescript_tools import AppleScriptTool
+from memory_tools import MemoryTool
 
 def load_config():
     """Loads configuration from config.json."""
@@ -30,6 +31,7 @@ shell_tool = ShellTool()
 search_tool = DuckDuckGoSearchRun()
 file_tool = FileTool()
 applescript_tool = AppleScriptTool()
+memory_tool = MemoryTool(persist_directory=config.get("chroma_db_path"))
 
 # --- Define Agents ---
 
@@ -39,9 +41,10 @@ planner = Agent(
     backstory=(
         "You are a meticulous planner. Your expertise lies in taking a complex user goal and decomposing it into a series of simple, actionable steps. "
         "You use your web search tool to gather all necessary information, such as URLs, commands, or best practices, before creating the final plan. "
+        "You also use your memory tool to store and retrieve relevant information from past interactions or research. "
         "Your plans are passed to an Executor agent, so they must be unambiguous and easy to follow."
     ),
-    tools=[search_tool],
+    tools=[search_tool, memory_tool],
     allow_delegation=False,
     verbose=True
 )

@@ -47,7 +47,14 @@ run_test "Create a file named 'test_file_tool.txt' with the content 'hello file 
 # Test 4: AppleScriptTool usage (display notification)
 run_test "Display a notification saying 'Hello from Mac Agent!'" "Hello from Mac Agent!"
 
-# Clean up the test files
+# Test 5: MemoryTool - Store information
+run_test "Remember that my favorite color is blue." "Successfully stored document with ID: doc_1."
+
+# Test 6: MemoryTool - Retrieve information
+run_test "What is my favorite color?" "Retrieved: blue"
+
+# Clean up the test files and ChromaDB
 rm test.txt test_file_tool.txt 2>/dev/null
+rm -rf "$SCRIPT_DIR/chroma_db" 2>/dev/null
 
 echo -e "\n--- Test Suite Finished ---"

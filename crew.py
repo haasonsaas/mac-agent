@@ -4,6 +4,7 @@ import json
 from crewai import Agent, Task, Crew, Process
 from crewai_tools import DuckDuckGoSearchRun
 from tools import ShellTool
+from file_tools import FileTool
 
 def load_config():
     """Loads configuration from config.json."""
@@ -26,6 +27,7 @@ if config.get("openai_base_url"):
 # Instantiate tools
 shell_tool = ShellTool()
 search_tool = DuckDuckGoSearchRun()
+file_tool = FileTool()
 
 # --- Define Agents ---
 
@@ -43,13 +45,15 @@ planner = Agent(
 )
 
 executor = Agent(
-    role="Command Execution Specialist",
-    goal="Execute the shell commands outlined in a given plan with precision and care.",
+    role="Command and File Execution Specialist",
+    goal="Execute the shell commands and file operations outlined in a given plan with precision and care.",
     backstory=(
-        "You are an expert at executing shell commands. You take a step-by-step plan and run each command using your shell tool. "
-        "You do not deviate from the plan. You are careful and will report the results of each command's execution accurately."
+        "You are an expert at executing tasks. You take a step-by-step plan and use the best tool for the job. "
+        "For general shell commands, use the ShellTool. "
+        "For file system operations like reading, writing, or listing files, **you must use the FileTool** as it is safer and more structured. "
+        "You do not deviate from the plan. You are careful and will report the results of each action accurately."
     ),
-    tools=[shell_tool],
+    tools=[shell_tool, file_tool],
     allow_delegation=False,
     verbose=True
 )
@@ -64,24 +68,32 @@ def create_tasks(user_prompt):
     )
 
     execution_task = Task(
-        description="Take the plan provided and execute each step using your shell tool. The final answer must be a summary of the results of each step.",
+        description=(
+            "Take the plan provided and execute each step using the most appropriate tool. "
+            "Use the FileTool for reading, writing, and listing files. Use the ShellTool for all other terminal commands. "
+            "The final answer must be a summary of the results of each step."
+        ),
         expected_output="A summary of the execution results for each step in the plan.",
         agent=executor,
         context=[planning_task] # This task depends on the output of the planning_task
     )
+    
     return [planning_task, execution_task]
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         user_prompt = sys.argv[1]
         tasks = create_tasks(user_prompt)
+        
         crew = Crew(
             agents=[planner, executor],
             tasks=tasks,
             process=Process.sequential,
             verbose=2
         )
+        
         result = crew.kickoff()
+        
         print("\n--- Task Result ---")
         print(result)
     else:

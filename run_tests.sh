@@ -42,9 +42,9 @@ run_test "What is the current date?" "$(date +%Y)" # Check for the current year
 run_test "What is the capital of France?" "Paris"
 
 # Test 3: A more complex task involving planning
-run_test "Create a file named 'test.txt' with the content 'hello world' and then print its content." "hello world"
+run_test "Create a file named 'test_file_tool.txt' with the content 'hello file tool' and then read its content." "Successfully wrote to test_file_tool.txt." "hello file tool"
 
-# Clean up the test file
-rm test.txt 2>/dev/null
+# Clean up the test files
+rm test.txt test_file_tool.txt 2>/dev/null
 
 echo -e "\n--- Test Suite Finished ---"

@@ -2,6 +2,7 @@ import os
 import sys
 import json
 from crewai import Agent, Task, Crew, Process
+from crewai_tools import DuckDuckGoSearchRun
 from tools import ShellTool
 
 def load_config():
@@ -22,17 +23,22 @@ os.environ["OPENAI_API_KEY"] = api_key
 if config.get("openai_base_url"):
     os.environ["OPENAI_API_BASE"] = config.get("openai_base_url")
 
+# Instantiate tools
+shell_tool = ShellTool()
+search_tool = DuckDuckGoSearchRun()
+
 # Define the agent
 mac_agent = Agent(
-    role='macOS Automation Specialist',
-    goal='Fulfill user requests by generating and executing shell commands on a macOS system.',
+    role='Senior macOS Automation and Research Specialist',
+    goal='Fulfill user requests by combining web research with local command execution to achieve complex tasks.',
     backstory=(
-        "You are an expert in macOS automation. You have access to a shell tool that can execute any command. "
-        "Your primary goal is to understand the user's request, formulate a precise shell command to achieve it, and then execute that command. "
-        "You should prioritize using standard shell commands (`ls`, `grep`, `find`, etc.) and use `osascript` only when necessary for GUI or application-specific control. "
-        "You are methodical and always confirm your actions before executing them."
+        "You are an expert in macOS automation and an adept web researcher. You have access to two powerful tools: "
+        "a shell for executing local commands and a web search tool for finding information. "
+        "Your primary goal is to seamlessly integrate these tools. For example, if a user asks to 'download the latest version of node.js', "
+        "you will first use the search tool to find the download URL, and then use the shell tool with `curl` to download it. "
+        "You are methodical, breaking down complex problems into a sequence of research and execution steps."
     ),
-    tools=[ShellTool()],
+    tools=[shell_tool, search_tool],
     allow_delegation=False,
     verbose=True
 )
@@ -40,8 +46,8 @@ mac_agent = Agent(
 # Define the task
 def create_task(user_prompt):
     return Task(
-        description=f"The user wants to perform the following action: '{user_prompt}'. Your task is to generate the appropriate shell command and execute it using the ShellTool. The final answer must be the output of the shell command.",
-        expected_output="The result of the shell command execution.",
+        description=f"The user wants to perform the following action: '{user_prompt}'. Your task is to understand the request, create a plan, and then use your available tools (ShellTool and DuckDuckGoSearchRun) to execute the plan. The final answer must be the result of your work.",
+        expected_output="A summary of the actions taken and the final result or output.",
         agent=mac_agent
     )
 

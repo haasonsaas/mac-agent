@@ -69,23 +69,19 @@ def create_tasks(user_prompt):
         agent=executor,
         context=[planning_task] # This task depends on the output of the planning_task
     )
-    
     return [planning_task, execution_task]
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         user_prompt = sys.argv[1]
         tasks = create_tasks(user_prompt)
-        
         crew = Crew(
             agents=[planner, executor],
             tasks=tasks,
             process=Process.sequential,
             verbose=2
         )
-        
         result = crew.kickoff()
-        
         print("\n--- Task Result ---")
         print(result)
     else:
